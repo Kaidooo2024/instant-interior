@@ -105,12 +105,14 @@ const textureConfigs = {
     1: {
         name: 'Living Room 1',
         file: 'livingroom_1-2.png',
-        path: './src/livingroom_1-2.png'
+        path: './src/livingroom_1-2.png',
+        customTexture: null // Store custom uploaded texture
     },
     2: {
         name: 'Living Room 2',
         file: 'livingroom_2-2.png',
-        path: './src/livingroom_2-2.png'
+        path: './src/livingroom_2-2.png',
+        customTexture: null // Store custom uploaded texture
     }
 };
 
@@ -121,21 +123,30 @@ function switchTexture(textureIndex) {
 
     console.log(`Switching to texture: ${config.name}`);
     
-    // Load new texture
-    const textureLoader = new THREE.TextureLoader();
-    textureLoader.load(config.path, (texture) => {
-        // Update sphere material
-        sphereMaterial.map = texture;
+    // Check if there's a custom uploaded texture
+    if (config.customTexture) {
+        // Use custom texture
+        sphereMaterial.map = config.customTexture;
         sphereMaterial.needsUpdate = true;
-        
-        // Update UI
         updateUI(textureIndex);
-        
-        console.log(`Texture loaded successfully: ${config.name}`);
-    }, undefined, (error) => {
-        console.error('Texture loading failed:', error);
-        alert(`Texture loading failed: ${config.name}`);
-    });
+        console.log(`Custom texture loaded successfully: ${config.name}`);
+    } else {
+        // Load default texture
+        const textureLoader = new THREE.TextureLoader();
+        textureLoader.load(config.path, (texture) => {
+            // Update sphere material
+            sphereMaterial.map = texture;
+            sphereMaterial.needsUpdate = true;
+            
+            // Update UI
+            updateUI(textureIndex);
+            
+            console.log(`Texture loaded successfully: ${config.name}`);
+        }, undefined, (error) => {
+            console.error('Texture loading failed:', error);
+            alert(`Texture loading failed: ${config.name}`);
+        });
+    }
 }
 
 // Update UI Display
@@ -155,11 +166,63 @@ function updateUI(textureIndex) {
     if (currentFileEl) currentFileEl.textContent = config.file;
 }
 
+// Handle Image Upload
+function handleImageUpload(file, textureIndex) {
+    if (!file) return;
+    
+    // Check if it's an image
+    if (!file.type.startsWith('image/')) {
+        alert('Please upload an image file!');
+        return;
+    }
+    
+    // Create FileReader to read the image
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+        const textureLoader = new THREE.TextureLoader();
+        
+        // Load the uploaded image as texture
+        textureLoader.load(e.target.result, (texture) => {
+            // Store the custom texture
+            textureConfigs[textureIndex].customTexture = texture;
+            
+            // If this texture is currently active, apply it immediately
+            if (currentTextureIndex === textureIndex) {
+                sphereMaterial.map = texture;
+                sphereMaterial.needsUpdate = true;
+            }
+            
+            console.log(`Custom image uploaded for texture ${textureIndex}`);
+            
+            // Visual feedback
+            const btn = document.getElementById(`texture${textureIndex}Btn`);
+            btn.style.animation = 'pulse 0.5s ease-in-out';
+            setTimeout(() => {
+                btn.style.animation = '';
+            }, 500);
+        }, undefined, (error) => {
+            console.error('Failed to load uploaded image:', error);
+            alert('Failed to load the uploaded image. Please try another file.');
+        });
+    };
+    
+    reader.onerror = () => {
+        alert('Failed to read the image file. Please try again.');
+    };
+    
+    // Read the file as data URL
+    reader.readAsDataURL(file);
+}
+
 // Setup Texture Switch Controls
 function setupTextureControls() {
     const texture1Btn = document.getElementById('texture1Btn');
     const texture2Btn = document.getElementById('texture2Btn');
+    const preDesignUpload = document.getElementById('preDesignUpload');
+    const postDesignUpload = document.getElementById('postDesignUpload');
 
+    // Texture switch buttons
     texture1Btn.addEventListener('click', () => {
         if (currentTextureIndex !== 1) {
             currentTextureIndex = 1;
@@ -171,6 +234,25 @@ function setupTextureControls() {
         if (currentTextureIndex !== 2) {
             currentTextureIndex = 2;
             switchTexture(2);
+        }
+    });
+    
+    // Image upload handlers
+    preDesignUpload.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            handleImageUpload(file, 1);
+            // Reset input to allow uploading the same file again
+            e.target.value = '';
+        }
+    });
+    
+    postDesignUpload.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            handleImageUpload(file, 2);
+            // Reset input to allow uploading the same file again
+            e.target.value = '';
         }
     });
 }
@@ -187,151 +269,6 @@ function setupChatBot() {
     const textureBtn = document.getElementById('textureBtn');
     const aiBtn = document.getElementById('aiBtn');
     const menuBtn = document.getElementById('menuBtn');
-
-    // Drag functionality with enhanced sensitivity
-    let isDragging = false;
-    let dragOffset = { x: 0, y: 0 };
-    let currentPosition = { x: 0, y: 0 };
-    let dragThreshold = 3; // Reduced threshold for higher sensitivity
-    let hasMoved = false;
-
-    // Initialize position
-    const updatePosition = (x, y) => {
-        floatingButton.style.left = x + 'px';
-        floatingButton.style.top = y + 'px';
-        floatingButton.style.transform = 'translateY(-50%)';
-        currentPosition = { x, y };
-    };
-
-    // Constrain to viewport with fixed dimensions
-    const constrainToViewport = (x, y) => {
-        const buttonWidth = 60;
-        const buttonHeight = 200;
-        const maxX = window.innerWidth - buttonWidth;
-        const maxY = window.innerHeight - buttonHeight;
-        
-        return {
-            x: Math.max(0, Math.min(x, maxX)),
-            y: Math.max(0, Math.min(y, maxY))
-        };
-    };
-
-    // Mouse down - start drag with enhanced sensitivity
-    floatingButton.addEventListener('mousedown', (e) => {
-        // Don't start drag if chat is expanded
-        if (floatingButton.classList.contains('expanded')) {
-            return;
-        }
-        
-        // Don't start drag if clicking on navigation buttons
-        if (e.target.closest('.nav-button')) {
-            return;
-        }
-        
-        hasMoved = false;
-        isDragging = true;
-        floatingButton.classList.add('dragging');
-        
-        const rect = floatingButton.getBoundingClientRect();
-        dragOffset = {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
-        };
-        
-        e.preventDefault();
-    });
-
-    // Mouse move - drag with higher sensitivity
-    document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        
-        const newX = e.clientX - dragOffset.x;
-        const newY = e.clientY - dragOffset.y;
-        const constrained = constrainToViewport(newX, newY);
-        
-        // Check if mouse has moved enough to start dragging
-        const deltaX = Math.abs(e.clientX - (currentPosition.x + dragOffset.x));
-        const deltaY = Math.abs(e.clientY - (currentPosition.y + dragOffset.y));
-        
-        if (deltaX > dragThreshold || deltaY > dragThreshold) {
-            hasMoved = true;
-        }
-        
-        if (hasMoved) {
-            updatePosition(constrained.x, constrained.y);
-        }
-    });
-
-    // Mouse up - end drag
-    document.addEventListener('mouseup', () => {
-        if (isDragging) {
-            isDragging = false;
-            floatingButton.classList.remove('dragging');
-            hasMoved = false;
-        }
-    });
-
-    // Touch events for mobile with enhanced sensitivity
-    floatingButton.addEventListener('touchstart', (e) => {
-        // Don't start drag if chat is expanded
-        if (floatingButton.classList.contains('expanded')) {
-            return;
-        }
-        
-        if (e.target.closest('.nav-button')) {
-            return;
-        }
-        
-        hasMoved = false;
-        isDragging = true;
-        floatingButton.classList.add('dragging');
-        
-        const touch = e.touches[0];
-        const rect = floatingButton.getBoundingClientRect();
-        dragOffset = {
-            x: touch.clientX - rect.left,
-            y: touch.clientY - rect.top
-        };
-        
-        e.preventDefault();
-    });
-
-    document.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
-        
-        const touch = e.touches[0];
-        const newX = touch.clientX - dragOffset.x;
-        const newY = touch.clientY - dragOffset.y;
-        const constrained = constrainToViewport(newX, newY);
-        
-        // Check if touch has moved enough to start dragging
-        const deltaX = Math.abs(touch.clientX - (currentPosition.x + dragOffset.x));
-        const deltaY = Math.abs(touch.clientY - (currentPosition.y + dragOffset.y));
-        
-        if (deltaX > dragThreshold || deltaY > dragThreshold) {
-            hasMoved = true;
-        }
-        
-        if (hasMoved) {
-            updatePosition(constrained.x, constrained.y);
-        }
-        
-        e.preventDefault();
-    });
-
-    document.addEventListener('touchend', () => {
-        if (isDragging) {
-            isDragging = false;
-            floatingButton.classList.remove('dragging');
-            hasMoved = false;
-        }
-    });
-
-    // Handle window resize
-    window.addEventListener('resize', () => {
-        const constrained = constrainToViewport(currentPosition.x, currentPosition.y);
-        updatePosition(constrained.x, constrained.y);
-    });
 
     // AI Response Database
     const aiResponses = {
@@ -434,9 +371,6 @@ function setupChatBot() {
         // Reset to home button active state
         homeBtn.classList.add('active');
         aiBtn.classList.remove('active');
-        // Re-enable dragging when chat is closed
-        isDragging = false;
-        hasMoved = false;
     });
 
     // Navigation button handlers
@@ -472,18 +406,15 @@ function setupChatBot() {
         
         // Toggle AI chat
         if (floatingButton.classList.contains('expanded')) {
-            // Close AI chat - re-enable dragging
+            // Close AI chat
             floatingButton.classList.remove('expanded');
             document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
             homeBtn.classList.add('active'); // Return to home state
         } else {
-            // Open AI chat - disable dragging
+            // Open AI chat
             document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
             aiBtn.classList.add('active');
             floatingButton.classList.add('expanded');
-            // Disable dragging when chat is expanded
-            isDragging = false;
-            hasMoved = false;
         }
     });
 

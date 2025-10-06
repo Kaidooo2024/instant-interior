@@ -23,7 +23,7 @@ body {
     position: absolute;
     top: 50px;
     right: 20px;
-    background: rgba(242, 240, 230, 0.85);
+    background: rgba(242, 240, 230, 0.3);
     backdrop-filter: blur(20px);
     padding: 20px;
     border-radius: 20px;
@@ -84,7 +84,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
     flex: 1;
     padding: 12px 16px;
-    background: rgba(196, 183, 166, 0.2);
+    background: rgba(196, 183, 166, 0.1);
     border: 2px solid rgba(196, 183, 166, 0.4);
     border-radius: 12px;
     color: #1A3A4A;
@@ -125,8 +125,8 @@ body {
 }
 
 .texture-btn:hover {
-    background: rgba(196, 183, 166, 0.3);
-    border-color: rgba(196, 183, 166, 0.6);
+    background: rgba(196, 183, 166, 0.1);
+    border-color: rgba(196, 183, 166, 0.2);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(26, 58, 74, 0.15);
 }
@@ -152,6 +152,94 @@ body {
 .texture-info .current {
     color: #1A3A4A;
     font-weight: 600;
+}
+
+/* Upload Section */
+.upload-section {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.upload-item {
+    position: relative;
+}
+
+.upload-input {
+    display: none;
+}
+
+.upload-label {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(196, 183, 166, 0.15);
+    border: 2px dashed rgba(196, 183, 166, 0.4);
+    border-radius: 12px;
+    color: #1A3A4A;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-feature-settings: 'kern' 1;
+}
+
+.upload-label:hover {
+    background: rgba(196, 183, 166, 0.25);
+    border-color: rgba(196, 183, 166, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(26, 58, 74, 0.15);
+}
+
+.upload-label:active {
+    transform: translateY(0);
+}
+
+.upload-icon {
+    width: 16px;
+    height: 16px;
+    color: #1A3A4A;
+}
+
+/* Responsive Upload Section */
+@media (max-width: 768px) {
+    .upload-section {
+        margin-top: 12px;
+        gap: 8px;
+    }
+    
+    .upload-label {
+        padding: 8px 12px;
+        font-size: 11px;
+        border-radius: 10px;
+    }
+    
+    .upload-icon {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .upload-section {
+        margin-top: 10px;
+        gap: 6px;
+    }
+    
+    .upload-label {
+        padding: 6px 10px;
+        font-size: 10px;
+        border-radius: 8px;
+    }
+    
+    .upload-icon {
+        width: 12px;
+        height: 12px;
+    }
 }
 
 .app-header {
@@ -385,7 +473,7 @@ body {
     backdrop-filter: blur(20px);
     border: 1px solid rgba(196, 183, 166, 0.3);
     border-radius: 30px;
-    cursor: move;
+    cursor: pointer;
     z-index: 999;
     display: flex;
     flex-direction: column;
@@ -396,7 +484,6 @@ body {
     overflow: hidden;
     padding: 8px 0;
     user-select: none;
-    resize: none;
 }
 
 /* 响应式浮动导航面板 */
@@ -427,14 +514,8 @@ body {
     }
 }
 
-.floating-chat-button.dragging {
-    cursor: grabbing;
-    transform: translateY(-50%) scale(1.05);
-    box-shadow: 0 12px 40px rgba(26, 58, 74, 0.25);
-}
-
 .floating-chat-button:hover {
-    transform: translateY(-50%) scale(1.1);
+    transform: translateY(-50%) scale(1.05);
     box-shadow: 0 12px 40px rgba(26, 58, 74, 0.3);
     border-color: rgba(196, 183, 166, 0.5);
 }
@@ -572,11 +653,6 @@ body {
 .floating-chat-button.expanded {
     cursor: default !important;
     user-select: text !important;
-}
-
-.floating-chat-button.expanded.dragging {
-    cursor: default !important;
-    transform: translateY(-50%) !important;
 }
 
 .chat-close {
