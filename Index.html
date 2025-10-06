@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instant Interior - Real-time Interior Design</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="container">
+        <!-- 应用标题 -->
+        <div class="app-header">
+            <div class="app-title-container">
+                <div class="app-logo">
+                    <img src="./src/logo.png" alt="Instant Interior Logo" width="20" height="20">
+                </div>
+                <div class="app-title-text">
+                    <h1 class="app-title">Instant Interior</h1>
+                    <p class="app-subtitle">Real-time Interior Design Experience Platform</p>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Texture Control Panel -->
+        <div class="texture-control-panel">
+            <h3>Interior Design</h3>
+            <div class="texture-buttons">
+                <button class="texture-btn active" id="texture1Btn">Re-design</button>
+                <button class="texture-btn" id="texture2Btn">Post-design</button>
+            </div>
+
+        </div>
+
+        <!-- Floating Navigation Panel -->
+        <div class="floating-chat-button" id="floatingChatButton">
+            <!-- Home Button -->
+            <button class="nav-button active" id="homeBtn" title="Home">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9,22 9,12 15,12 15,22"/>
+                </svg>
+            </button>
+            
+            <!-- Texture Button -->
+            <button class="nav-button" id="textureBtn" title="Textures">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                </svg>
+            </button>
+            
+            <!-- AI Assistant Button -->
+            <button class="nav-button" id="aiBtn" title="AI Assistant">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+            </button>
+            
+            <!-- Menu Button -->
+            <button class="nav-button" id="menuBtn" title="Menu">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+            
+            <!-- Chat Content (Hidden by default) -->
+            <div class="chat-content" id="chatContent">
+                <div class="chat-header">
+                    <div class="chat-title">
+                        <div class="ai-avatar">AI</div>
+                        Instant Interior Assistant
+                    </div>
+                    <button class="chat-close" id="chatClose">×</button>
+                </div>
+                <div class="chat-main">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message ai">
+                            Hello! I'm the Instant Interior AI assistant. I can help you understand how to use this interior design platform, answer questions about texture switching, interaction controls, and more. What would you like to know?
+                        </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" id="chatInput" placeholder="Type your question..." maxlength="200">
+                        <button class="chat-send" id="chatSend">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
